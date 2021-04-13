@@ -4,15 +4,14 @@ Code for multi-variable polynomial regression
 This code fits a multi-variable polynmoial equation to multi-variable outputs. We first prepare the data as follows
 
 
-wb_train = pd.read_excel (r'C:\Users\EEE Admin\Desktop\ALL CODE\FORWARD\training.xlsx')
-wb_targets = pd.read_excel (r'C:\Users\EEE Admin\Desktop\ALL CODE\FORWARD\targets.xlsx')
+wb_train = pd.read_excel (r'C:\Users\blah\training.xlsx')
+wb_targets = pd.read_excel (r'C:\Users\blahD\targets.xlsx')
 
 df_train = pd.DataFrame(wb_train)
 df_train = df_train.to_numpy()
 
 df_targets = pd.DataFrame(wb_targets)
 df_targets = df_targets.to_numpy()
-# training_data = np.array([[1,2,3],[4,5,6]])
 
 mean_dat = df_train[:,:].mean(axis=0)
 std_dat = df_train[:,:].std(axis=0)
