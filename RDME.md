@@ -4,7 +4,7 @@ MVPR is [available on PyPI][pypi], and can be installed via
 ```none
 pip install MVPR
 ```
-This package fits a multi-variable polynomial equation to a set of data using cross validation. The solution is regularised using truncated singular value decomposition of the Moore-Penrose pseudo-inverse, where the truncation point is found using a golden section search.
+This package fits a multi-variable polynomial equation to a set of data using cross validation. The solution is regularised using truncated singular value decomposition of the Moore-Penrose pseudo-inverse, where the truncation point is found using a golden section search. It is suitable for ill-posed problems, and for preventing over-fitting to noise. 
 
 
 [pypi]:  https://pypi.org/project/MVPR/
