@@ -19,7 +19,10 @@ and another set:
 
 ![image](https://user-images.githubusercontent.com/60707891/115008872-91ecb880-9ea3-11eb-9ef9-e0dc9d2537b6.png)
 
-We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors $`\sqrt{2}`$
+We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors
+
+![image](https://user-images.githubusercontent.com/60707891/115009673-70d89780-9ea4-11eb-97f3-a02e29d4fb30.png)
+
 
 
 
@@ -62,22 +65,36 @@ coefficient_matrix = M.compute_CM(optimum_order)
 predicted_validation = M.compute(coefficient_matrix, optimum_order, validation_data)
 
 df = pd.DataFrame(predicted_validation)
-df.to_excel(r'C:\Users\EEE Admin\Desktop\test_MVPR\predicted.xlsx')
+df.to_excel(r'C:\Users\filepath\predicted.xlsx')
 ```
-The fitted curve:
+The fitted curves:
 
-![image](https://user-images.githubusercontent.com/60707891/114898241-d592e400-9e09-11eb-9f88-28702ac9b0c8.png)
+![image](https://user-images.githubusercontent.com/60707891/115009854-a5e4ea00-9ea4-11eb-8774-6c87cf89c7b5.png)
+
+![image](https://user-images.githubusercontent.com/60707891/115009871-abdacb00-9ea4-11eb-9d12-b76d45b67835.png)
 
 # Functions and arguments
+```
+MVPR.find_order()
+```
+This function finds the optimal order of polynomial in the range 0 to 6, using cross validation. 
+```
+MVPR.find_order()
+```
+This function finds the optimal order of polynomial in the range 0 to 6, using cross validation. 
+```
+MVPR.compute_CM(order)
+```
+This function computes the coefficient matrix which fits a polynomial to the measured data in a least squares sense. The fit is regularised using truncated singular value decomposition, which eliminates singular values under a certain threshold. Any oder can be passed into this by the user, it does not have to have the range limited inf find_oder(). 
 
 # Theory 
-"...the **go to** statement should be abolished..." [[1]](#1).
+
+ For the theory behind the code see [[1]](#1).
 
 ## References
 <a id="1">[1]</a> 
-Dijkstra, E. W. (1968). 
-Go to statement considered harmful. 
-Communications of the ACM, 11(3), 147-148.
+Hansen, P. C.  (1997). 
+Rank-deficient and Discrete Ill-posed Problems: Numerical Aspects of Linear Inversion. 
 
 
 
