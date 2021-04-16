@@ -19,11 +19,9 @@ and another set:
 
 ![image](https://user-images.githubusercontent.com/60707891/115008872-91ecb880-9ea3-11eb-9ef9-e0dc9d2537b6.png)
 
-We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors
+We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors into a matrix as (1). This matrix of target data can be split into training, validation or test and passed directly into the MVPR class. Alternatively, they can be passed seperately into the code, such that different polynomial orders can be used. 
 
 ![image](https://user-images.githubusercontent.com/60707891/115009673-70d89780-9ea4-11eb-97f3-a02e29d4fb30.png)
-
-
 
 
 First import the data:
