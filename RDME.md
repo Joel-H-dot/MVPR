@@ -87,12 +87,15 @@ This function computes the coefficient matrix which fits a polynomial to the mea
 
 # Theory 
 
- For the theory behind the code see [[1]](#1).
+ For the theory behind the code see [[1]](#1) and [[2]](#2).
 
 ## References
 <a id="1">[1]</a> 
 Hansen, P. C.  (1997). 
 Rank-deficient and Discrete Ill-posed Problems: Numerical Aspects of Linear Inversion. 
 
-
+<a id="2">[2]</a> 
+Hampton, J., Tesfalem, H., Fletcher, A., Peyton, A., Brown, M (2021). 
+Reconstructing the conductivity profile of a graphite block using inductance spectroscopy with data-driven techniques. 
+Insight - Non-Destructive Testing and Condition Monitoring, 63(2), 82-87.
 
