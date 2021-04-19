@@ -84,16 +84,16 @@ MVPR_object = MVP.MVPR_forward(training_data, training_targets, validation_data,
 The verbose argument is optional, its default value is false. Also, the search for the truncation point can either be in the truncation point exponent space or in the standard space. the truncation point can either be written as 10^a or as b, the input argument search specifies whether we search for the value of a or b:
 ```
 :
-            if self.search == 'exponent':
-                distance = 0.61803398875 * (np.log10(ind_high_1) - np.log10(ind_low_1))
-                ind_low_2 = round(10 ** (np.log10(ind_high_1) - distance))
-                ind_high_2 = round(10 ** (np.log10(ind_low_1) + distance))
-            else:
-                distance = 0.61803398875 * (ind_high_1 - ind_low_1)
-                ind_low_2 = round(ind_high_1 - distance)
-                ind_high_2 = round(ind_low_1 + distance)
-                :
-                ```
+if self.search == 'exponent':
+   distance = 0.61803398875 * (np.log10(ind_high_1) - np.log10(ind_low_1))
+   ind_low_2 = round(10 ** (np.log10(ind_high_1) - distance))
+   ind_high_2 = round(10 ** (np.log10(ind_low_1) + distance))
+else:
+   distance = 0.61803398875 * (ind_high_1 - ind_low_1)
+   ind_low_2 = round(ind_high_1 - distance)
+   ind_high_2 = round(ind_low_1 + distance)
+:
+```
 ```
 optimal_order=MVPR_object.find_order()
 ```
@@ -107,7 +107,7 @@ This function computes the coefficient matrix which fits a polynomial to the mea
 
  For the theory behind the code see [[1]](#1) and [[2]](#2). 
 
-# References
+## References
 <a id="1">[1]</a> 
 Hansen, P. C.  (1997). 
 Rank-deficient and Discrete Ill-posed Problems: Numerical Aspects of Linear Inversion. 
