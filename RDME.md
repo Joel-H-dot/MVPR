@@ -81,7 +81,9 @@ import MVPR as MVP
 :
 MVPR_object = MVP.MVPR_forward(training_data, training_targets, validation_data, validation_targets, verbose=True, search = 'exponent')
 ```
-The verbose argument is optional, its default value is false. Also, the search for the truncation point can either be in the truncation point exponent space or in the standard space. the truncation point can either be written as 10^a or as b, the input argument search specifies whether we search for the value of a or b:
+The verbose argument is optional, its default value is false. 
+
+The truncation point can either be written as 10^a or as b, the input argument 'search' specifies whether we search for the value of a or b; see the following code segment from the golden section search: 
 ```
 :
 if self.search == 'exponent':
@@ -94,10 +96,12 @@ else:
    ind_high_2 = round(ind_low_1 + distance)
 :
 ```
+___________________________________________________________________________________________________________
 ```
 optimal_order=MVPR_object.find_order()
 ```
 This function finds the optimal order of polynomial in the range 0 to 6, using cross validation. 
+___________________________________________________________________________________________________________
 ```
 MVPR_object.compute_CM(order)
 ```
