@@ -4,7 +4,7 @@ MVPR is [available on PyPI][pypi], and can be installed via
 ```none
 pip install MVPR
 ```
-This package fits a multi-variable polynomial equation to a set of data using cross validation. The solution is regularised using truncated singular value decomposition of the Moore-Penrose pseudo-inverse, where the truncation point is found using a golden section search. It is suitable for ill-posed problems, and for preventing over-fitting to noise. 
+This package fits a multi-variable polynomial equation to a set of data using cross validation. The solution is regularised using truncated singular value decomposition of the Moore-Penrose pseudo-inverse, where the truncation point is found using a golden section search. It is suitable for ill-posed problems, and for preventing over-fitting to noise. Tikohnov regularisation may be included in a future release if there is sufficient demand.   
 
 
 [pypi]:  https://pypi.org/project/MVPR/
@@ -19,13 +19,17 @@ and another set:
 
 ![image](https://user-images.githubusercontent.com/60707891/115008872-91ecb880-9ea3-11eb-9ef9-e0dc9d2537b6.png)
 
-We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors into a matrix as (1). This matrix of target data can be split into training, validation or test and passed directly into the MVPR class. Alternatively, they can be passed seperately into the code, such that different polynomial orders can be used. 
+We want to find some mapping function for the same input data. Using the MVPR code we can place the vectors into a matrix as (1). This matrix of target data can be split into training, validation or test and passed directly into an MVPR class object. Alternatively, they can be passed seperately into two different instantiations, such that different polynomial orders can be used. 
 
 ![image](https://user-images.githubusercontent.com/60707891/115009673-70d89780-9ea4-11eb-97f3-a02e29d4fb30.png)
 
 
 First import the data:
 ```
+import MVPR as MVP
+import numpy as np
+import pandas as pd
+from openpyxl import load_workbook
 df= pd.read_excel(r'C:\Users\filepath\data.xlsx')
 data=df.to_numpy()
 df= pd.read_excel(r'C:\Users\filepath\targets.xlsx')
@@ -34,7 +38,7 @@ targets=df.to_numpy()
 select the proportions of data for cross-validation
 ```
 proportion_training = 0.9
-num_train_samples = round(len(data[:,0])*0.8)
+num_train_samples = round(len(data[:,0])*proportion_training)
 num_val_samples = round(len(data[:,0]))-num_train_samples
 ```
 standardise:
@@ -73,23 +77,37 @@ The fitted curves:
 
 # Functions and arguments
 ```
-MVPR.find_order()
+import MVPR as MVP
+:
+MVPR_object = MVP.MVPR_forward(training_data, training_targets, validation_data, validation_targets, verbose=True, search = 'exponent')
+```
+The verbose argument is optional, its default value is false. Also, the search for the truncation point can either be in the truncation point exponent space or in the standard space. the truncation point can either be written as 10^a or as b, the input argument search specifies whether we search for the value of a or b:
+```
+:
+            if self.search == 'exponent':
+                distance = 0.61803398875 * (np.log10(ind_high_1) - np.log10(ind_low_1))
+                ind_low_2 = round(10 ** (np.log10(ind_high_1) - distance))
+                ind_high_2 = round(10 ** (np.log10(ind_low_1) + distance))
+            else:
+                distance = 0.61803398875 * (ind_high_1 - ind_low_1)
+                ind_low_2 = round(ind_high_1 - distance)
+                ind_high_2 = round(ind_low_1 + distance)
+                :
+                ```
+```
+optimal_order=MVPR_object.find_order()
 ```
 This function finds the optimal order of polynomial in the range 0 to 6, using cross validation. 
 ```
-MVPR.find_order()
+MVPR_object.compute_CM(order)
 ```
-This function finds the optimal order of polynomial in the range 0 to 6, using cross validation. 
-```
-MVPR.compute_CM(order)
-```
-This function computes the coefficient matrix which fits a polynomial to the measured data in a least squares sense. The fit is regularised using truncated singular value decomposition, which eliminates singular values under a certain threshold. Any oder can be passed into this by the user, it does not have to have the range limited inf find_oder(). 
+This function computes the coefficient matrix which fits a polynomial to the measured data in a least squares sense. The fit is regularised using truncated singular value decomposition, which eliminates singular values under a certain threshold. Any oder can be passed into this by the user, it does not have to have the range limited in find_oder(). 
 
 # Theory 
 
- For the theory behind the code see [[1]](#1) and [[2]](#2).
+ For the theory behind the code see [[1]](#1) and [[2]](#2). 
 
-## References
+# References
 <a id="1">[1]</a> 
 Hansen, P. C.  (1997). 
 Rank-deficient and Discrete Ill-posed Problems: Numerical Aspects of Linear Inversion. 
