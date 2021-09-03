@@ -5,7 +5,7 @@ from scipy.linalg import svd
 class MVPR_forward():
 
     def __init__(self,training_data, training_targets, validation_data,validation_targets, regularisation = 'TSVD', verbose=False, search='exponent'):
-        self.training_data= training_data
+        self.training_data = training_data
         self.training_targets = training_targets
         self.validation_data = validation_data
         self.validation_targets = validation_targets
@@ -16,9 +16,42 @@ class MVPR_forward():
         self.tik_lam_upper = 10e3
         self.tik_lam_lower = 10e-10
 
+        self.target_standardisation = True
+        self.training_standardisation = True
+
+        self.mean_targets = self.training_targets.mean(axis=0)
+        self.std_targets  = self.training_targets.std(axis=0)
+
+        self.mean_data = self.training_data.mean(axis=0)
+        self.std_data = self.training_data.std(axis=0)
+
+        if self.training_standardisation:
+            self.training_data = self.training_data - self.mean_data
+            self.validation_data = self.validation_data - self.mean_data
+
+            if 0 not in self.std_data :
+                self.training_data /= self.std_data
+                self.validation_data /= self.std_data
+        else:
+            self.training_data = self.training_data
+            self.validation_data = self.validation_data
+
+        if self.target_standardisation:
+            self.training_targets = self.training_targets - self.mean_targets
+            self.validation_targets = self.validation_targets - self.mean_targets
+
+            if 0 not in self.std_targets :
+                self.training_targets /= self.std_targets
+                self.validation_targets /= self.std_targets
+        else:
+            self.training_targets = np.copy(self.training_targets)
+            self.validation_targets = np.copy(self.validation_targets)
+
 
 
     def TSVD_error(self,X_val,V,S,U,ind):
+
+
 
         SIGMA = np.diag(S)
 
@@ -35,9 +68,10 @@ class MVPR_forward():
 
     def GSS_TSVD(self,X_train,X_val):
 
-        number_of_elements = len(X_train[0, :]) * len(X_train[:, 0])
+        number_of_variables = len(X_train[0, :])
+        number_of_elements = number_of_variables*len(X_train[:, 0])
 
-        if number_of_elements > 2 ** 26:
+        if number_of_variables > 2**15:
             raise Exception("Matrix too large, SVD will crash using scipy. Limit on indexing with lapack package.") # see https://github.com/scipy/scipy/issues/14001
 
         U, S, VT = svd(X_train)
@@ -97,7 +131,7 @@ class MVPR_forward():
 
         error, CM = self.TSVD_error(X_val, V, S, U, int(ind))
 
-        return error, CM
+        return error, CM, ind
 
     def Tik_error(self, X_val, X_train, lambda_param):
 
@@ -209,7 +243,7 @@ class MVPR_forward():
 
         error, CM = self.Tik_error(X_val, X_train, param)
 
-        return error, CM
+        return error, CM, param
 
     def select_func(self):
         if self.regularisation == 'TSVD':
@@ -218,6 +252,8 @@ class MVPR_forward():
             self.GSS = self.GSS_Tik
 
     def find_order(self):
+
+
 
         self.select_func()
 
@@ -231,29 +267,88 @@ class MVPR_forward():
             X_val = poly.fit_transform(self.validation_data)
 
             try:
-                error[i], dummy=self.GSS(X_train,X_val)
+                error[i], dummy, dummy2=self.GSS(X_train,X_val)
             except:
                 error[i]=np.inf
 
             if self.verbose:
                 print('order = ', order[i], '| error = ', error[i])
-                
+            print('order = ', order[i], '| error = ', error[i])
+
         optimum_order_index = np.where(np.min(error) == error)
         optimum_order = int(order[optimum_order_index])
         return optimum_order
 
     def compute_CM(self, order):
+
+
         self.select_func()
         poly = PolynomialFeatures(degree=order)
         X_train = poly.fit_transform(self.training_data)
         X_val = poly.fit_transform(self.validation_data)
-        error, CM =  self.GSS(X_train, X_val)
+        error, CM, ind =  self.GSS(X_train, X_val)
+
+        data_all = np.concatenate((self.training_data, self.validation_data),axis=0)
+        targets_all = np.concatenate((self.training_targets, self.validation_targets),axis=0)
+        X_all = poly.fit_transform(data_all)
+        if self.regularisation == 'TSVD':
+
+            U, S, VT = svd(X_all)
+            V = np.transpose(VT)
+
+            SIGMA = np.diag(S)
+
+            T_INV = np.matmul(np.matmul(V[:, 0: ind], np.linalg.inv(SIGMA[0:ind, 0:ind])), np.transpose(U[:, 0: ind]))
+            CM = np.matmul(T_INV, targets_all)
+
+        else:
+            XTX = np.matmul(np.transpose(X_all), X_all)
+            XTA = np.matmul(np.transpose(X_all), targets_all)
+
+            prior = np.matmul(np.linalg.inv(XTX), XTA)
+
+            if self.reg_type == 'Identity':
+                RM = np.ones((len(prior[:, 0]), len(prior[:, 0])))
+                RM = np.diag(np.diag(RM))
+            elif self.reg_type == 'Finite Difference':
+                RM = np.zeros((len(prior[:, 0]), len(prior[:, 0])))
+
+                for i in range(0, 9):
+                    RM[i, i + 1] = 0.5
+                for i in range(0, 9):
+                    RM[i + 1, i] = -0.5
+                RM[0, 0] = -1
+                RM[0, 1] = 1
+                RM[-1, -1] = 1
+                RM[-1, -2] = -1
+            else:
+                RM = np.zeros((len(prior[:, 0]), len(prior[:, 0])))
+
+            RMTRM = np.matmul(np.transpose(RM), RM)
+
+            denom = XTX + ind * RMTRM
+            num = XTA + ind * np.matmul(RMTRM, prior)
+
+            CM = np.matmul(np.linalg.inv(denom), num)
 
         return CM
 
     def compute(self, CM, order, data):
+
+        if self.training_standardisation:
+            data = data - self.mean_data
+
+            if 0 not in self.std_data:
+                data /= self.std_data
+
+
         poly = PolynomialFeatures(degree=order)
         X = poly.fit_transform(data)
+        predicted_transformed_space = np.matmul(X, CM)
 
-        return np.matmul(X, CM)
+        predicted = predicted_transformed_space*self.std_targets
+
+        predicted += self.mean_targets
+
+        return predicted
 
