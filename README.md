@@ -1,3 +1,9 @@
+Please reference this package as:
+
+Hampton, J., Tesfalem, H., Fletcher, A., Peyton, A., Brown, M (2021). 
+Reconstructing the conductivity profile of a graphite block using inductance spectroscopy with data-driven techniques. 
+Insight - Non-Destructive Testing and Condition Monitoring, 63(2), 82-87.
+
 # Overview
 
 MVPR is [available on PyPI][pypi], and can be installed via
